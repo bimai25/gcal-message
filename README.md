@@ -1,0 +1,1 @@
+This is an application that sends daily texts of a user's events for the day pulled from their personal Google Calendar.
