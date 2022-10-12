@@ -41,13 +41,12 @@ def main():
         # print a list of all currently displayed calendars
         print('Getting all currently displayed calendars:')
         page_token = None
-        while True:
-            calendar_list = service.calendarList().list(pageToken=page_token).execute()
-            for calendar_list_entry in calendar_list['items']:
-                print (calendar_list_entry['summary'])
-            page_token = calendar_list.get('nextPageToken')
-            if not page_token:
-                break
+        calendar_list = service.calendarList().list().execute()
+        for calendar_list_entry in calendar_list['items']:
+            id = calendar_list_entry['id']
+            # gets the calendar using the ids from calendar list
+            calendar = service.calendars().get(calendarId=id).execute()
+            print (calendar['summary'])
         return
 
     except HttpError as error:
