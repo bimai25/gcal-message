@@ -14,9 +14,6 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 
 def main():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -37,16 +34,27 @@ def main():
 
     try:
         service = build('calendar', 'v3', credentials=creds)
+        all_calendars = list()
+        #timeMin = datetime.datetime.now().isoformat()
+        #timeMax = timeMin + timedelta(hours=24)
+        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+
 
         # print a list of all currently displayed calendars
-        print('Getting all currently displayed calendars:')
-        page_token = None
+        print('Getting events...')
         calendar_list = service.calendarList().list().execute()
         for calendar_list_entry in calendar_list['items']:
             id = calendar_list_entry['id']
             # gets the calendar using the ids from calendar list
             calendar = service.calendars().get(calendarId=id).execute()
-            print (calendar['summary'])
+            all_calendars.append(calendar)
+        for calendar in all_calendars:
+            #print(calendar['summary'])
+            event_list = service.events().list(calendarId=calendar['id'],maxResults=1, singleEvents=True,orderBy='startTime', timeMin=now).execute()
+            daily_events = event_list.get('items',[])
+            for event in daily_events:
+                start = event['start'].get('dateTime',event['start'].get('date'))
+                print(event['summary'], start)
         return
 
     except HttpError as error:
