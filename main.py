@@ -35,10 +35,14 @@ def main():
     try:
         service = build('calendar', 'v3', credentials=creds)
         all_calendars = list()
-        #timeMin = datetime.datetime.now().isoformat()
-        #timeMax = timeMin + timedelta(hours=24)
-        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
+        #build the start and end time 24 hour periods
+        current_date = datetime.date.today()
+        startTime = datetime.datetime.combine(current_date,datetime.time(hour=0))
+        endTime = datetime.datetime.combine(current_date, datetime.time(hour=23, minute=59, second=59))
+        #convert to RFC 3339 format
+        formatStart = startTime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        formatEnd = endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # print a list of all currently displayed calendars
         print('Getting events...')
@@ -50,7 +54,7 @@ def main():
             all_calendars.append(calendar)
         for calendar in all_calendars:
             #print(calendar['summary'])
-            event_list = service.events().list(calendarId=calendar['id'],maxResults=1, singleEvents=True,orderBy='startTime', timeMin=now).execute()
+            event_list = service.events().list(calendarId=calendar['id'],maxResults=1, singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
             daily_events = event_list.get('items',[])
             for event in daily_events:
                 start = event['start'].get('dateTime',event['start'].get('date'))
