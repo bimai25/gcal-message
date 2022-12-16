@@ -34,29 +34,27 @@ def getEvents():
 
     try:
         service = build('calendar', 'v3', credentials=creds)
-        all_calendars = list()
+        events =  []
         message = "Here are your events today: \n \n"
 
-        #build the start and end time 24 hour periods
-        current_date = datetime.date.today()
-        startTime = datetime.datetime.combine(current_date,datetime.time(hour=0))
-        endTime = datetime.datetime.combine(current_date, datetime.time(hour=23, minute=59, second=59))
-        #convert to RFC 3339 format
-        formatStart = startTime.strftime("%Y-%m-%dT%H:%M:%SZ")
-        formatEnd = endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        #build the start and end time 24 hour periods (adjusting for PST and converting to RFC 0339 encoding)
+        now = datetime.datetime.now()
+        tz = datetime.timezone(datetime.timedelta(hours=-8))
+        formatStart = datetime.datetime.combine(now, datetime.time.min, tz).isoformat()
+        formatEnd = datetime.datetime.combine(now, datetime.time.max, tz).isoformat()
+
+        print(formatStart,formatEnd)
 
         # print a list of all currently displayed calendars
         print('Getting events...')
         calendar_list = service.calendarList().list().execute()
-        for calendar_list_entry in calendar_list['items']:
-            id = calendar_list_entry['id']
-            # gets the calendar using the ids from calendar list
-            calendar = service.calendars().get(calendarId=id).execute()
-            all_calendars.append(calendar)
-        for calendar in all_calendars:
-            event_list = service.events().list(calendarId=calendar['id'], singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
-            daily_events = event_list.get('items',[])
-            for event in daily_events:
+        calendar_ids = [calendar['id'] for calendar in calendar_list['items']]
+
+        for calendar_id in calendar_ids:
+            calendar_events = service.events().list(calendarId=calendar_id, timeMin=formatStart, timeMax=formatEnd,
+                    singleEvents=True, orderBy='startTime').execute()
+            events.extend(calendar_events['items'])
+        for event in events:
                 start = event['start'].get('dateTime',event['start'].get('date'))
                 end = event['end'].get('dateTime',event['end'].get('date'))
 
@@ -66,6 +64,10 @@ def getEvents():
                 end_string = parseString.parseTime(end)
 
                 message += str(event['summary']) + " - " + start_string + " to " + end_string + "\n"
+        #for calendar in calendar_ids:
+            #event_list = service.events().list(calendarId=calendar, maxResults=10,singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
+            #daily_events = event_list.get('items',[])
+
         message += "\nHave a great day!"
         toReturn = '\'' + message + '\''
         print(message)
