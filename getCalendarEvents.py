@@ -43,9 +43,7 @@ def getEvents():
         formatStart = datetime.datetime.combine(now, datetime.time.min, tz).isoformat()
         formatEnd = datetime.datetime.combine(now, datetime.time.max, tz).isoformat()
 
-        print(formatStart,formatEnd)
-
-        # print a list of all currently displayed calendars
+        # get all the events from the current 24 hour period
         print('Getting events...')
         calendar_list = service.calendarList().list().execute()
         calendar_ids = [calendar['id'] for calendar in calendar_list['items']]
@@ -54,24 +52,7 @@ def getEvents():
             calendar_events = service.events().list(calendarId=calendar_id, timeMin=formatStart, timeMax=formatEnd,
                     singleEvents=True, orderBy='startTime').execute()
             events.extend(calendar_events['items'])
-        for event in events:
-                start = event['start'].get('dateTime',event['start'].get('date'))
-                end = event['end'].get('dateTime',event['end'].get('date'))
-
-                start_string = parseString.parseTime(start)
-                if start_string[0:2] == 12: #catch case if the start time is midnight
-                    start_string.replace("pm","am")
-                end_string = parseString.parseTime(end)
-
-                message += str(event['summary']) + " - " + start_string + " to " + end_string + "\n"
-        #for calendar in calendar_ids:
-            #event_list = service.events().list(calendarId=calendar, maxResults=10,singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
-            #daily_events = event_list.get('items',[])
-
-        message += "\nHave a great day!"
-        toReturn = '\'' + message + '\''
-        print(message)
-        return toReturn
+        return events #return a list of all the events (unsorted)
 
     except HttpError as error:
         print('An error occurred: %s' % error)

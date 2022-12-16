@@ -3,10 +3,9 @@ from phoneNumber import PHONE_NUMBER
 
 import os
 import getCalendarEvents
+import message
 
 RECIPIENT_NUMBER = PHONE_NUMBER
-MESSAGE = getCalendarEvents.getEvents()
+MESSAGE = '\'' + message.buildMessage(getCalendarEvents.getEvents()) + '\''
 
-fd = fetch_data.FetchData()
-messages = fd.get_messages()
 os.system("osascript sendMessage.applescript {} {}".format(RECIPIENT_NUMBER, MESSAGE))
