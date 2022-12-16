@@ -13,7 +13,6 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-
 def getEvents():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
