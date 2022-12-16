@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import datetime
 import os.path
+import parseString
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,7 +14,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 
-def main():
+def getEvents():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -35,6 +36,7 @@ def main():
     try:
         service = build('calendar', 'v3', credentials=creds)
         all_calendars = list()
+        message = "Here are your events today: \n \n"
 
         #build the start and end time 24 hour periods
         current_date = datetime.date.today()
@@ -53,12 +55,20 @@ def main():
             calendar = service.calendars().get(calendarId=id).execute()
             all_calendars.append(calendar)
         for calendar in all_calendars:
-            #print(calendar['summary'])
             event_list = service.events().list(calendarId=calendar['id'],maxResults=1, singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
             daily_events = event_list.get('items',[])
             for event in daily_events:
                 start = event['start'].get('dateTime',event['start'].get('date'))
-                print(event['summary'], start)
+                end = event['end'].get('dateTime',event['end'].get('date'))
+
+                start_string = parseString.parseTime(start)
+                if start_string[0:2] == 12: #catch case if the start time is midnight
+                    start_string.replace("pm","am")
+                end_string = parseString.parseTime(end)
+
+                message += str(event['summary']) + " - " + start_string + " to " + end_string + "\n"
+        message += "\nHave a great day!"
+        print(message)
         return
 
     except HttpError as error:
@@ -66,4 +76,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    getEvents()
