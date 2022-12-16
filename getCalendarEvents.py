@@ -68,8 +68,9 @@ def getEvents():
 
                 message += str(event['summary']) + " - " + start_string + " to " + end_string + "\n"
         message += "\nHave a great day!"
+        toReturn = '\'' + message + '\''
         print(message)
-        return
+        return toReturn
 
     except HttpError as error:
         print('An error occurred: %s' % error)

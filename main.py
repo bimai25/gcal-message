@@ -1,8 +1,10 @@
 from imessage_reader import fetch_data
-import os
 
-RECIPIENT_NUMBER = "+17147152590"
-MESSAGE = "'Hello world!'"
+import os
+import getCalendarEvents
+
+RECIPIENT_NUMBER = "+17145884969"
+MESSAGE = getCalendarEvents.getEvents()
 
 fd = fetch_data.FetchData()
 messages = fd.get_messages()
