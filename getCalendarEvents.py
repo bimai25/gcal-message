@@ -54,7 +54,7 @@ def getEvents():
             calendar = service.calendars().get(calendarId=id).execute()
             all_calendars.append(calendar)
         for calendar in all_calendars:
-            event_list = service.events().list(calendarId=calendar['id'],maxResults=1, singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
+            event_list = service.events().list(calendarId=calendar['id'], singleEvents=True,orderBy='startTime', timeMin=formatStart, timeMax = formatEnd).execute()
             daily_events = event_list.get('items',[])
             for event in daily_events:
                 start = event['start'].get('dateTime',event['start'].get('date'))
