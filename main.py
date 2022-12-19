@@ -6,6 +6,6 @@ import getCalendarEvents
 import message
 
 RECIPIENT_NUMBER = PHONE_NUMBER
-MESSAGE = '\'' + message.buildMessage(getCalendarEvents.getEvents()) + '\''
+MESSAGE = '\'' + message.buildMessage(message.parseEvents(getCalendarEvents.getEvents())) + '\''
 
 os.system("osascript sendMessage.applescript {} {}".format(RECIPIENT_NUMBER, MESSAGE))
