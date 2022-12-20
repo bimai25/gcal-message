@@ -1,4 +1,3 @@
-from imessage_reader import fetch_data
 from phoneNumber import PHONE_NUMBER
 
 import os

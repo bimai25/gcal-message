@@ -10,9 +10,11 @@ class Event:
     endTime: datetime
     summary: str
 
+#custom sort function
 def sort_chronologically(event):
     return event.startTime
 
+#parse the raw events from google calendar, create Event objects, and sort chronologically
 def parseEvents(events):
     allEvents = list()
     for event in events:
@@ -23,6 +25,7 @@ def parseEvents(events):
     allEvents.sort(key = sort_chronologically)
     return allEvents
 
+#build the outputted message from a list of Event objects
 def buildMessage(events):
     message = "Here are your events today: \n\n"
     for event in events:
